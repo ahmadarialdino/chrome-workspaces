@@ -2,7 +2,7 @@
 * { box-sizing:border-box; }
 [hidden] { display:none !important; }
 body { margin:0; width:340px; max-height:600px; overflow:hidden; background:var(--bg); color:var(--text); font:13px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
-main { padding:15px; }
+main { display:flex; flex-direction:column; padding:15px; }
 header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
 h1 { margin:0; font-size:17px; letter-spacing:-.2px; }
 form { display:flex; gap:7px; margin-bottom:12px; }
@@ -13,7 +13,7 @@ form button { padding:7px 12px; background:var(--accent); color:#fff; font-weigh
 #recent-toggle { width:34px; padding:7px; border:1px solid var(--line); background:var(--card); color:var(--accent); font-size:17px; line-height:1; }
 #recent-toggle:hover { background:rgba(127,127,127,.1); }
 #recent-toggle svg { display:block; width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
-#list { display:grid; gap:7px; max-height:470px; overflow-y:auto; overscroll-behavior:contain; padding-right:2px; }
+#list { display:grid; gap:7px; max-height:470px; min-height:0; overflow-y:auto; overscroll-behavior:contain; padding-right:2px; }
 .empty { padding:22px 5px; color:var(--muted); text-align:center; }
 .row { display:grid; grid-template-columns:11px minmax(0,1fr) auto; gap:9px; align-items:center; padding:10px; border:1px solid var(--line); border-radius:11px; background:var(--card); }
 .row.active { border-color:#8ab4f8; background:#eaf2ff; }
@@ -37,14 +37,14 @@ form button { padding:7px 12px; background:var(--accent); color:#fff; font-weigh
 .menu-item:disabled { opacity:.35; cursor:default; background:transparent; }
 #status { margin:8px 0 0; color:#b3261e; font-size:11px; }
 #status:empty { display:none; }
-#recent-section { margin-top:2px; }
+#recent-section { display:flex; flex:1; flex-direction:column; min-height:0; margin-top:2px; }
 .recent-head { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
 #recent-back { width:30px; height:30px; padding:0; background:var(--card); color:var(--text); border:1px solid var(--line); font-size:17px; }
 #recent-back:hover { background:rgba(127,127,127,.1); }
 h2 { margin:0 0 7px; color:var(--muted); font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; }
 .recent-head h2 { margin:0; }
 #recent-count { letter-spacing:0; }
-#recent-list { display:grid; gap:4px; max-height:260px; overflow:auto; }
+#recent-list { display:grid; flex:1; gap:4px; min-height:0; overflow:auto; }
 .recent { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:8px; padding:7px 8px; border-radius:8px; }
 .recent:hover { background:rgba(127,127,127,.1); }
 .recent-text { min-width:0; }
