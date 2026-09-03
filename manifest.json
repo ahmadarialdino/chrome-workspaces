@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Workspaces",
+  "version": "4.3.0",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzauDHhiCcy+0OKSTM4JLj59YkBioktZYBXbtcXlgD5KNRw/8PpVCJ1sVYUOM7h6hZJJgvPQ4MLMZ8K00SqzDh2CY1j0BDf6K0iig0Mbq+4ji6mErVjjehfIlfYeeyYkBN3Og7m+T4PlstOeOipPZFkjLoFW00iPZmpc1oX2SUz+S80fOIRkaQmP5hYFkIaMSj0NSq1CLMhlRwPiXDua+cq3fYMlXNqukk9iUKU7IlM2X1C1G3taM9UYG8+MFk78c6VqWSVsaDzbakMl07b2cVGBXArZCHOFh3WOthZVfQEBENg+dHhwcnVc3uk04uXunwvU4aS+E+HTujhsXUPAvCwIDAQAB",
+  "description": "A compact Safari-style workspace switcher for Chrome.",
+  "permissions": ["tabs", "tabGroups", "storage"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Workspaces",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/workspaces-16.png",
+      "32": "icons/workspaces-32.png",
+      "48": "icons/workspaces-48.png",
+      "128": "icons/workspaces-128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/workspaces-16.png",
+    "32": "icons/workspaces-32.png",
+    "48": "icons/workspaces-48.png",
+    "128": "icons/workspaces-128.png"
+  },
+  "commands": {
+    "open-workspaces": {
+      "suggested_key": {
+        "default": "Alt+W",
+        "mac": "Option+W"
+      },
+      "description": "Open the Workspaces menu"
+    }
+  }
+}
