@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.3.1
+
+- Made the Workspaces and Recently Closed views use a consistent popup height.
+- Restored natural workspace sizing so the outer padding stays balanced.
+
 ## 4.3.0
 
 - Added drag-and-drop workspace reordering.
