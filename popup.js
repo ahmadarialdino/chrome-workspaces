@@ -102,10 +102,12 @@ async function renderRecentlyClosed(){
 }
 
 document.querySelector("#recent-toggle").onclick=()=>{
+  const main=document.querySelector("main");main.style.height=`${main.getBoundingClientRect().height}px`;
   document.querySelector("#workspace-header").hidden=true;document.querySelector("#create").hidden=true;list.hidden=true;document.querySelector("#recent-section").hidden=false;
 };
 document.querySelector("#recent-back").onclick=()=>{
   document.querySelector("#recent-section").hidden=true;document.querySelector("#workspace-header").hidden=false;document.querySelector("#create").hidden=false;list.hidden=false;
+  document.querySelector("main").style.height="";
 };
 document.addEventListener("click",event=>{if(!event.target.closest(".more-wrap"))closeMoreMenus();});
 async function send(message){const response=await chrome.runtime.sendMessage({...message,windowId});if(!response?.ok)throw new Error(response?.error||"Workspace operation failed.");}
