@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Workspaces</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main>
+    <header id="workspace-header"><h1>Workspaces</h1></header>
+    <form id="create"><input id="name" maxlength="40" placeholder="New workspace name" autofocus><button>Add</button><button id="recent-toggle" type="button" title="Recently closed tabs" aria-label="Recently closed tabs"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.6 8.2A8.5 8.5 0 1 1 3.5 12"/><path d="M4.6 4.5v3.7H8.3"/><path d="M12 7.5V12l3 1.8"/></svg></button></form>
+    <div id="list"></div>
+    <section id="recent-section" hidden>
+      <div class="recent-head"><button id="recent-back" type="button" aria-label="Back to workspaces">←</button><h2>Recently closed <span id="recent-count"></span></h2></div>
+      <div id="recent-list"></div>
+    </section>
+    <p id="status" role="status"></p>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>
