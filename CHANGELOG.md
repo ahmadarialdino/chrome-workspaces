@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.4.3
+
+- Replaced text-based expand arrows with consistent SVG chevrons.
+- Added a clearer tab-with-arrow icon for moving the current tab.
+
 ## 4.4.2
 
 - Gave the search field more space so its placeholder is fully visible.
