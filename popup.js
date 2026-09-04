@@ -105,10 +105,11 @@ async function render(){
     const row=document.createElement("div");row.className=`row${active?" active":""}`;
     const handle=document.createElement("span");handle.className="drag-handle";handle.draggable=true;handle.title="Drag to reorder";
     const dot=document.createElement("span");dot.className="dot";dot.style.setProperty("--color",COLORS[w.color]||COLORS.blue);handle.appendChild(dot);
-    handle.ondragstart=event=>{event.dataTransfer.effectAllowed="move";event.dataTransfer.setData("text/plain",w.id);};
-    card.ondragover=event=>{event.preventDefault();const after=event.clientY>card.getBoundingClientRect().top+card.offsetHeight/2;row.classList.toggle("drag-before",!after);row.classList.toggle("drag-after",after);};
-    row.ondragleave=()=>row.classList.remove("drag-before","drag-after");
-    row.ondrop=event=>{event.preventDefault();const after=row.classList.contains("drag-after"),draggedId=event.dataTransfer.getData("text/plain");row.classList.remove("drag-before","drag-after");run(()=>dropWorkspace(draggedId,w.id,after));};
+    handle.ondragstart=event=>{event.dataTransfer.effectAllowed="move";event.dataTransfer.setData("text/plain",w.id);card.classList.add("dragging");};
+    handle.ondragend=()=>{document.querySelectorAll(".workspace-card").forEach(item=>item.classList.remove("dragging","drop-before","drop-after"));};
+    card.ondragover=event=>{event.preventDefault();if(card.classList.contains("dragging"))return;const after=event.clientY>card.getBoundingClientRect().top+card.offsetHeight/2;card.classList.toggle("drop-before",!after);card.classList.toggle("drop-after",after);};
+    card.ondragleave=event=>{if(!card.contains(event.relatedTarget))card.classList.remove("drop-before","drop-after");};
+    card.ondrop=event=>{event.preventDefault();const after=card.classList.contains("drop-after"),draggedId=event.dataTransfer.getData("text/plain");document.querySelectorAll(".workspace-card").forEach(item=>item.classList.remove("dragging","drop-before","drop-after"));run(()=>dropWorkspace(draggedId,w.id,after));};
     const main=document.createElement("div");main.className="workspace";const title=document.createElement("div");title.className="title";title.textContent=w.title;
     const count=document.createElement("div");count.className="count";const n=urls.length;count.textContent=`${n} tab${n===1?"":"s"}${active?" · active":" · parked"}`;
     main.append(title,count);main.onclick=()=>run(()=>send({type:"workspace:switch",targetId:w.id}),true);
