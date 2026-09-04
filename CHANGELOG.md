@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.4.1
+
+- Moved search into the Add row to save vertical space.
+- Added a compact search mode that reuses the workspace-name field.
+
 ## 4.4.0
 
 - Added search across workspace names and saved tab URLs.
