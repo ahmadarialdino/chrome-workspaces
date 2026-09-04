@@ -147,7 +147,7 @@ document.querySelector("#recent-back").onclick=()=>{
 document.addEventListener("click",event=>{if(!event.target.closest(".more-wrap"))closeMoreMenus();});
 async function send(message){const response=await chrome.runtime.sendMessage({...message,windowId});if(!response?.ok)throw new Error(response?.error||"Workspace operation failed.");}
 async function run(operation,close=false){status.textContent="";try{await operation();if(close)return window.close();await migrateAndLoad();await render();await renderRecentlyClosed();}catch(error){status.textContent=error.message;}}
-function setSearchMode(enabled){searchMode=enabled;input.value="";input.placeholder=enabled?"Search workspaces and tabs":"New workspace name";primaryAction.textContent=enabled?"×":"Add";primaryAction.title=enabled?"Close search":"Add workspace";searchToggle.classList.toggle("active",enabled);input.focus();render().catch(error=>status.textContent=error.message);}
+function setSearchMode(enabled){searchMode=enabled;input.value="";input.placeholder=enabled?"Search workspaces & tabs":"New workspace name";primaryAction.textContent=enabled?"×":"Add";primaryAction.title=enabled?"Close search":"Add workspace";searchToggle.hidden=enabled;input.focus();render().catch(error=>status.textContent=error.message);}
 searchToggle.onclick=()=>setSearchMode(!searchMode);
 document.querySelector("#create").onsubmit=event=>{event.preventDefault();if(searchMode)return setSearchMode(false);run(async()=>{const title=input.value.trim();if(!title)return input.focus();await send({type:"workspace:create",title});input.value="";},true);};
 input.oninput=()=>{if(searchMode)render().catch(error=>status.textContent=error.message);};
