@@ -31,11 +31,11 @@ Chrome does not automatically update unpacked extensions. Download a newer relea
 
 - Enter a name and select **Add** to create a workspace.
 - Select a workspace name to switch to it.
-- Select the **tab-and-arrow icon** beside a parked workspace to move the current tab there.
+- Select <img src="icons/move-tab.svg" width="18" alt="Move tab"> beside a parked workspace to move the current tab there.
 - Use the search box to find a workspace or saved tab.
-- Select the **chevron** to expand a workspace, then open, move, or remove individual tabs.
-- Drag the coloured dot to reorder, or use the **three-dot menu → Move up/down**.
-- Use the **three-dot menu** to rename or delete a workspace.
+- Select <img src="icons/chevron-down.svg" width="18" alt="Expand"> to expand a workspace, then open, move, or remove individual tabs.
+- Drag the coloured dot to reorder, or use <img src="icons/more.svg" width="18" alt="More menu"> **→ Move up/down**.
+- Use <img src="icons/more.svg" width="18" alt="More menu"> to rename or delete a workspace.
 - Select the clock-history button beside **Add** to recover closed tabs.
 - Change the keyboard shortcut at `chrome://extensions/shortcuts`.
 
