@@ -32,12 +32,12 @@ async function migrateAndLoad(){
 }
 
 function small(label,title,handler){const b=document.createElement("button");b.type="button";b.className="small";b.textContent=label;b.title=title;b.onclick=async e=>{e.stopPropagation();await run(handler);};return b;}
-const ICONS={down:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 9.5 5 5 5-5"/></svg>',up:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 14.5 5-5 5 5"/></svg>',move:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="12" height="14" rx="2"/><path d="M10 12h10m-3.5-3.5L20 12l-3.5 3.5"/></svg>'};
+const ICONS={down:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 9.5 5 5 5-5"/></svg>',up:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 14.5 5-5 5 5"/></svg>',move:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="12" height="14" rx="2"/><path d="M10 12h10m-3.5-3.5L20 12l-3.5 3.5"/></svg>',more:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>'};
 function iconSmall(icon,title,handler,className=""){const b=small("",title,handler);b.innerHTML=ICONS[icon];if(className)b.classList.add(className);return b;}
 function closeMoreMenus(){document.querySelectorAll(".more-menu").forEach(menu=>menu.hidden=true);}
 function moreMenu(items){
   const wrap=document.createElement("div");wrap.className="more-wrap";
-  const button=document.createElement("button");button.type="button";button.className="small";button.textContent="⋯";button.title="More actions";button.setAttribute("aria-label","More workspace actions");
+  const button=document.createElement("button");button.type="button";button.className="small more-button";button.innerHTML=ICONS.more;button.title="More actions";button.setAttribute("aria-label","More workspace actions");
   const menu=document.createElement("div");menu.className="more-menu";menu.hidden=true;
   for(const item of items){
     const entry=document.createElement("button");entry.type="button";entry.className=`menu-item${item.danger?" danger":""}`;entry.textContent=item.label;entry.disabled=Boolean(item.disabled);
