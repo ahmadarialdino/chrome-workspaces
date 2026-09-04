@@ -62,12 +62,20 @@ async function dropWorkspace(draggedId,targetId,after){
   if(after)index+=1;state.workspaces.splice(index,0,dragged);await save();
 }
 const tabLabel=url=>{try{const parsed=new URL(url);return parsed.hostname+(parsed.pathname!=="/"?parsed.pathname:"");}catch{return url;}};
-async function moveTab(workspace,index){
-  const choices=state.workspaces.filter(w=>w.id!==workspace.id);if(!choices.length)throw new Error("Create another workspace first.");
-  const answer=prompt(`Move tab to:\n${choices.map((w,i)=>`${i+1}. ${w.title}`).join("\n")}`);if(answer===null)return;
-  const target=choices[Number(answer)-1]||choices.find(w=>w.title.toLowerCase()===answer.trim().toLowerCase());
-  if(!target)throw new Error("Choose a workspace number or exact name.");
-  await send({type:"workspace:tab-move",sourceId:workspace.id,targetId:target.id,index});
+function tabMoveMenu(workspace,index){
+  const wrap=document.createElement("div");wrap.className="more-wrap";
+  const button=document.createElement("button");button.type="button";button.className="tab-action";button.textContent="Move";button.title="Move to another workspace";
+  const menu=document.createElement("div");menu.className="more-menu tab-move-menu";menu.hidden=true;
+  const choices=state.workspaces.filter(w=>w.id!==workspace.id);
+  if(!choices.length){const empty=document.createElement("div");empty.className="menu-empty";empty.textContent="No other workspaces";menu.appendChild(empty);}
+  for(const target of choices){
+    const entry=document.createElement("button");entry.type="button";entry.className="menu-item workspace-choice";
+    const dot=document.createElement("span");dot.className="choice-dot";dot.style.setProperty("--color",COLORS[target.color]||COLORS.blue);
+    const label=document.createElement("span");label.textContent=target.title;entry.append(dot,label);
+    entry.onclick=event=>{event.stopPropagation();menu.hidden=true;run(()=>send({type:"workspace:tab-move",sourceId:workspace.id,targetId:target.id,index}));};menu.appendChild(entry);
+  }
+  button.onclick=event=>{event.stopPropagation();const opening=menu.hidden;closeMoreMenus();if(!opening)return;menu.hidden=false;const rect=button.getBoundingClientRect(),height=menu.offsetHeight;menu.style.left=`${Math.max(6,Math.min(rect.left,window.innerWidth-190))}px`;menu.style.top=`${Math.min(rect.bottom+4,window.innerHeight-height-6)}px`;};
+  wrap.append(button,menu);return wrap;
 }
 function tabPanel(workspace,urls,query){
   const panel=document.createElement("div");panel.className="tab-panel";
@@ -81,9 +89,8 @@ function tabPanel(workspace,urls,query){
     copy.append(title,host);copy.onclick=()=>run(()=>send({type:"workspace:tab-open",workspaceId:workspace.id,index:item.index}),true);
     const actions=document.createElement("div");actions.className="tab-actions";
     const open=small("Open","Open this tab",()=>send({type:"workspace:tab-open",workspaceId:workspace.id,index:item.index}));open.className="tab-action";
-    const move=small("Move","Move to another workspace",()=>moveTab(workspace,item.index));move.className="tab-action";
     const remove=small("×","Remove this tab",()=>send({type:"workspace:tab-remove",workspaceId:workspace.id,index:item.index}));remove.className="tab-action danger";
-    actions.append(open,move,remove);row.append(copy,actions);panel.appendChild(row);
+    actions.append(open,tabMoveMenu(workspace,item.index),remove);row.append(copy,actions);panel.appendChild(row);
   }
   return panel;
 }
