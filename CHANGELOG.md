@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.4.5
+
+- Replaced the native move-tab prompt with a styled workspace picker.
+- Added workspace colours and scrolling to the move destination menu.
+
 ## 4.4.4
 
 - Replaced the text ellipsis with a centred three-dot SVG menu icon.
