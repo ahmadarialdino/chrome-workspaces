@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.4.2
+
+- Gave the search field more space so its placeholder is fully visible.
+
 ## 4.4.1
 
 - Moved search into the Add row to save vertical space.
