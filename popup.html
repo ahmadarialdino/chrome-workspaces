@@ -10,6 +10,7 @@
   <main>
     <header id="workspace-header"><h1>Workspaces</h1></header>
     <form id="create"><input id="name" maxlength="40" placeholder="New workspace name" autofocus><button>Add</button><button id="recent-toggle" type="button" title="Recently closed tabs" aria-label="Recently closed tabs"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.6 8.2A8.5 8.5 0 1 1 3.5 12"/><path d="M4.6 4.5v3.7H8.3"/><path d="M12 7.5V12l3 1.8"/></svg></button></form>
+    <div id="search-wrap"><input id="search" type="search" placeholder="Search workspaces and tabs" aria-label="Search workspaces and tabs"></div>
     <div id="list"></div>
     <section id="recent-section" hidden>
       <div class="recent-head"><button id="recent-back" type="button" aria-label="Back to workspaces">←</button><h2>Recently closed <span id="recent-count"></span></h2></div>
