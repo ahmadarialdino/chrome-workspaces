@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.4.0
+
+- Added search across workspace names and saved tab URLs.
+- Added expandable tab lists for active and parked workspaces.
+- Added controls to open, move, or remove individual workspace tabs.
+
 ## 4.3.1
 
 - Made the Workspaces and Recently Closed views use a consistent popup height.
