@@ -7,6 +7,8 @@ A lightweight Chrome extension that brings a Safari-style workspace switcher to 
 - Switch between named workspaces from a compact toolbar popup.
 - Park inactive workspaces so their tabs disappear from the tab bar.
 - Move the current tab directly into another workspace.
+- Search across workspace names and saved tab URLs.
+- Expand any workspace to inspect, open, move, or remove individual tabs.
 - Reorder workspaces by dragging or from the **⋯** menu.
 - Rename and delete workspaces.
 - Recover up to 30 genuinely closed tabs for 30 days.
@@ -30,6 +32,8 @@ Chrome does not automatically update unpacked extensions. Download a newer relea
 - Enter a name and select **Add** to create a workspace.
 - Select a workspace name to switch to it.
 - Select **↗** beside a parked workspace to move the current tab there.
+- Use the search box to find a workspace or saved tab.
+- Select **⌄** to expand a workspace, then open, move, or remove individual tabs.
 - Drag the coloured dot to reorder, or use **⋯ → Move up/down**.
 - Use **⋯** to rename or delete a workspace.
 - Select the clock-history button beside **Add** to recover closed tabs.
