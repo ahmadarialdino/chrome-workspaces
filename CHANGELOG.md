@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.4.4
+
+- Replaced the text ellipsis with a centred three-dot SVG menu icon.
+
 ## 4.4.3
 
 - Replaced text-based expand arrows with consistent SVG chevrons.
