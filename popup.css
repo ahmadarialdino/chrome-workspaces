@@ -31,7 +31,9 @@ form button { padding:7px 12px; background:var(--accent); color:#fff; font-weigh
 .actions { display:flex; }
 .small { padding:5px 7px; background:transparent; color:var(--muted); }
 .small:hover { color:var(--text); background:rgba(127,127,127,.12); }
+.small svg { display:block; width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
 .expand { width:27px; padding:5px 4px; font-size:15px; }
+.move-current { width:29px; padding:5px 6px; }
 .tab-panel { border:1px solid var(--line); border-top:0; border-radius:0 0 11px 11px; background:var(--card); }
 .tab-item { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:6px; align-items:center; min-height:34px; padding:5px 7px 5px 10px; border-top:1px solid var(--line); }
 .tab-item:first-child { border-top:0; }
