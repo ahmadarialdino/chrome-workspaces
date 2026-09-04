@@ -1,7 +1,7 @@
 const COLORS={blue:"#8ab4f8",red:"#f28b82",yellow:"#fdd663",green:"#81c995",pink:"#ff8bcb",purple:"#c58af9",cyan:"#78d9ec",orange:"#fcad70",grey:"#bdc1c6"};
 const list=document.querySelector("#list"),status=document.querySelector("#status"),input=document.querySelector("#name");
-const search=document.querySelector("#search"),expanded=new Set();
-let windowId,state={workspaces:[],activeId:null};
+const primaryAction=document.querySelector("#primary-action"),searchToggle=document.querySelector("#search-toggle"),expanded=new Set();
+let windowId,searchMode=false,state={workspaces:[],activeId:null};
 const cleanUrl=tab=>tab.url&&!tab.url.startsWith("chrome-extension://")?tab.url:"chrome://newtab/";
 const save=()=>Promise.all([chrome.storage.sync.set({workspaceData:state.workspaces}),chrome.storage.local.set({workspaceState:state,workspaceActiveId:state.activeId})]);
 const ungrouped=async()=>(await chrome.tabs.query({windowId,pinned:false})).filter(tab=>tab.groupId===chrome.tabGroups.TAB_GROUP_ID_NONE);
@@ -87,7 +87,7 @@ function tabPanel(workspace,urls,query){
 }
 async function render(){
   list.replaceChildren();if(!state.workspaces.length){const e=document.createElement("div");e.className="empty";e.textContent="Create your first workspace above.";list.appendChild(e);return;}
-  const live=await ungrouped(),query=search.value.trim().toLowerCase();let shown=0;
+  const live=await ungrouped(),query=searchMode?input.value.trim().toLowerCase():"";let shown=0;
   for(const w of state.workspaces){
     const active=w.id===state.activeId,urls=active?live.map(cleanUrl):w.urls;
     const workspaceMatch=w.title.toLowerCase().includes(query),tabMatch=urls.some(url=>tabLabel(url).toLowerCase().includes(query));
@@ -138,15 +138,17 @@ async function renderRecentlyClosed(){
 
 document.querySelector("#recent-toggle").onclick=()=>{
   const main=document.querySelector("main");main.style.height=`${main.getBoundingClientRect().height}px`;
-  document.querySelector("#workspace-header").hidden=true;document.querySelector("#create").hidden=true;document.querySelector("#search-wrap").hidden=true;list.hidden=true;document.querySelector("#recent-section").hidden=false;
+  document.querySelector("#workspace-header").hidden=true;document.querySelector("#create").hidden=true;list.hidden=true;document.querySelector("#recent-section").hidden=false;
 };
 document.querySelector("#recent-back").onclick=()=>{
-  document.querySelector("#recent-section").hidden=true;document.querySelector("#workspace-header").hidden=false;document.querySelector("#create").hidden=false;document.querySelector("#search-wrap").hidden=false;list.hidden=false;
+  document.querySelector("#recent-section").hidden=true;document.querySelector("#workspace-header").hidden=false;document.querySelector("#create").hidden=false;list.hidden=false;
   document.querySelector("main").style.height="";
 };
 document.addEventListener("click",event=>{if(!event.target.closest(".more-wrap"))closeMoreMenus();});
 async function send(message){const response=await chrome.runtime.sendMessage({...message,windowId});if(!response?.ok)throw new Error(response?.error||"Workspace operation failed.");}
 async function run(operation,close=false){status.textContent="";try{await operation();if(close)return window.close();await migrateAndLoad();await render();await renderRecentlyClosed();}catch(error){status.textContent=error.message;}}
-document.querySelector("#create").onsubmit=event=>{event.preventDefault();run(async()=>{const title=input.value.trim();if(!title)return input.focus();await send({type:"workspace:create",title});input.value="";},true);};
-search.oninput=()=>render().catch(error=>status.textContent=error.message);
+function setSearchMode(enabled){searchMode=enabled;input.value="";input.placeholder=enabled?"Search workspaces and tabs":"New workspace name";primaryAction.textContent=enabled?"×":"Add";primaryAction.title=enabled?"Close search":"Add workspace";searchToggle.classList.toggle("active",enabled);input.focus();render().catch(error=>status.textContent=error.message);}
+searchToggle.onclick=()=>setSearchMode(!searchMode);
+document.querySelector("#create").onsubmit=event=>{event.preventDefault();if(searchMode)return setSearchMode(false);run(async()=>{const title=input.value.trim();if(!title)return input.focus();await send({type:"workspace:create",title});input.value="";},true);};
+input.oninput=()=>{if(searchMode)render().catch(error=>status.textContent=error.message);};
 (async()=>{try{windowId=(await chrome.windows.getCurrent()).id;await migrateAndLoad();await render();await renderRecentlyClosed();}catch(error){status.textContent=error.message;}})();
