@@ -88,8 +88,30 @@ async function restoreArchived(windowId,archiveId){
   await chrome.storage.local.set({closedArchive:archive.filter(entry=>entry.id!==archiveId)});
 }
 
+async function workspaceTab(windowId,workspaceId,index,action,targetId){
+  const state=await load(),workspace=state.workspaces.find(w=>w.id===workspaceId),active=workspaceId===state.activeId;
+  if(!workspace)throw new Error("Workspace no longer exists.");
+  const tabs=active?await getTabs(windowId):[],urls=active?tabs.map(cleanUrl):workspace.urls;
+  const url=urls[index];if(!url)throw new Error("Tab no longer exists.");
+  if(action==="open"){
+    if(active&&tabs[index])await chrome.tabs.update(tabs[index].id,{active:true});
+    else await chrome.tabs.create({windowId,url,active:true});
+    return;
+  }
+  if(action==="move"){
+    const target=state.workspaces.find(w=>w.id===targetId);if(!target||target.id===workspaceId)throw new Error("Choose another workspace.");
+    target.urls.push(url);
+  }
+  if(active){
+    const tab=tabs[index];
+    if(tabs.length===1){await chrome.tabs.update(tab.id,{url:"chrome://newtab/",active:true});workspace.urls=["chrome://newtab/"];}
+    else{await closeIntentionally(tab.id);workspace.urls=tabs.filter((_,i)=>i!==index).map(cleanUrl);}
+  }else workspace.urls.splice(index,1);
+  await save(state);
+}
+
 chrome.runtime.onMessage.addListener((message,_sender,respond)=>{
-  const work=message?.type==="workspace:switch"?switchWorkspace(message.windowId,message.targetId):message?.type==="workspace:create"?createWorkspace(message.windowId,message.title):message?.type==="workspace:move-tab"?moveCurrentTab(message.windowId,message.targetId):message?.type==="archive:restore"?restoreArchived(message.windowId,message.archiveId):null;
+  const work=message?.type==="workspace:switch"?switchWorkspace(message.windowId,message.targetId):message?.type==="workspace:create"?createWorkspace(message.windowId,message.title):message?.type==="workspace:move-tab"?moveCurrentTab(message.windowId,message.targetId):message?.type==="archive:restore"?restoreArchived(message.windowId,message.archiveId):message?.type==="workspace:tab-open"?workspaceTab(message.windowId,message.workspaceId,message.index,"open"):message?.type==="workspace:tab-remove"?workspaceTab(message.windowId,message.workspaceId,message.index,"remove"):message?.type==="workspace:tab-move"?workspaceTab(message.windowId,message.sourceId,message.index,"move",message.targetId):null;
   if(!work)return false;
   work.then(()=>respond({ok:true})).catch(error=>respond({ok:false,error:error.message}));return true;
 });
