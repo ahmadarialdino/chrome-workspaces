@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.4.6
+
+- Improved workspace drag-and-drop with smooth card feedback.
+- Added an animated insertion indicator and reduced drag flicker.
+
 ## 4.4.5
 
 - Replaced the native move-tab prompt with a styled workspace picker.
