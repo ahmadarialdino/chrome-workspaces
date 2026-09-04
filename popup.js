@@ -32,6 +32,8 @@ async function migrateAndLoad(){
 }
 
 function small(label,title,handler){const b=document.createElement("button");b.type="button";b.className="small";b.textContent=label;b.title=title;b.onclick=async e=>{e.stopPropagation();await run(handler);};return b;}
+const ICONS={down:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 9.5 5 5 5-5"/></svg>',up:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 14.5 5-5 5 5"/></svg>',move:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="12" height="14" rx="2"/><path d="M10 12h10m-3.5-3.5L20 12l-3.5 3.5"/></svg>'};
+function iconSmall(icon,title,handler,className=""){const b=small("",title,handler);b.innerHTML=ICONS[icon];if(className)b.classList.add(className);return b;}
 function closeMoreMenus(){document.querySelectorAll(".more-menu").forEach(menu=>menu.hidden=true);}
 function moreMenu(items){
   const wrap=document.createElement("div");wrap.className="more-wrap";
@@ -104,8 +106,8 @@ async function render(){
     const count=document.createElement("div");count.className="count";const n=urls.length;count.textContent=`${n} tab${n===1?"":"s"}${active?" · active":" · parked"}`;
     main.append(title,count);main.onclick=()=>run(()=>send({type:"workspace:switch",targetId:w.id}),true);
     const actions=document.createElement("div");actions.className="actions";
-    const isExpanded=expanded.has(w.id)||Boolean(query&&tabMatch);const expand=small(isExpanded?"⌃":"⌄",isExpanded?"Hide tabs":"Show tabs",async()=>{expanded.has(w.id)?expanded.delete(w.id):expanded.add(w.id);});expand.classList.add("expand");actions.append(expand);
-    if(!active)actions.append(small("↗","Move current tab here",()=>send({type:"workspace:move-tab",targetId:w.id})));
+    const isExpanded=expanded.has(w.id)||Boolean(query&&tabMatch);const expand=iconSmall(isExpanded?"up":"down",isExpanded?"Hide tabs":"Show tabs",async()=>{expanded.has(w.id)?expanded.delete(w.id):expanded.add(w.id);},"expand");actions.append(expand);
+    if(!active)actions.append(iconSmall("move","Move current tab here",()=>send({type:"workspace:move-tab",targetId:w.id}),"move-current"));
     const position=state.workspaces.findIndex(item=>item.id===w.id);
     actions.append(moreMenu([
       {label:"Move up",disabled:position===0,handler:()=>moveWorkspace(w.id,-1)},
