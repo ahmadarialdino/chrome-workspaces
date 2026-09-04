@@ -52,6 +52,11 @@ form button { padding:7px 12px; background:var(--accent); color:#fff; font-weigh
 .menu-item:hover { background:rgba(127,127,127,.12); }
 .menu-item.danger { color:#b3261e; }
 .menu-item:disabled { opacity:.35; cursor:default; background:transparent; }
+.tab-move-menu { width:184px; max-height:220px; overflow-y:auto; }
+.workspace-choice { display:flex; align-items:center; gap:8px; }
+.choice-dot { width:8px; height:8px; flex:0 0 8px; border-radius:50%; background:var(--color); }
+.workspace-choice span:last-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.menu-empty { padding:8px 9px; color:var(--muted); font-size:11px; }
 #status { margin:8px 0 0; color:#b3261e; font-size:11px; }
 #status:empty { display:none; }
 #recent-section { display:flex; flex:1; flex-direction:column; min-height:0; margin-top:2px; }
