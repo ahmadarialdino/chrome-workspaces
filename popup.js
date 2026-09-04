@@ -1,5 +1,6 @@
 const COLORS={blue:"#8ab4f8",red:"#f28b82",yellow:"#fdd663",green:"#81c995",pink:"#ff8bcb",purple:"#c58af9",cyan:"#78d9ec",orange:"#fcad70",grey:"#bdc1c6"};
 const list=document.querySelector("#list"),status=document.querySelector("#status"),input=document.querySelector("#name");
+const search=document.querySelector("#search"),expanded=new Set();
 let windowId,state={workspaces:[],activeId:null};
 const cleanUrl=tab=>tab.url&&!tab.url.startsWith("chrome-extension://")?tab.url:"chrome://newtab/";
 const save=()=>Promise.all([chrome.storage.sync.set({workspaceData:state.workspaces}),chrome.storage.local.set({workspaceState:state,workspaceActiveId:state.activeId})]);
@@ -58,21 +59,52 @@ async function dropWorkspace(draggedId,targetId,after){
   let index=state.workspaces.findIndex(w=>w.id===targetId);if(index<0)return;
   if(after)index+=1;state.workspaces.splice(index,0,dragged);await save();
 }
+const tabLabel=url=>{try{const parsed=new URL(url);return parsed.hostname+(parsed.pathname!=="/"?parsed.pathname:"");}catch{return url;}};
+async function moveTab(workspace,index){
+  const choices=state.workspaces.filter(w=>w.id!==workspace.id);if(!choices.length)throw new Error("Create another workspace first.");
+  const answer=prompt(`Move tab to:\n${choices.map((w,i)=>`${i+1}. ${w.title}`).join("\n")}`);if(answer===null)return;
+  const target=choices[Number(answer)-1]||choices.find(w=>w.title.toLowerCase()===answer.trim().toLowerCase());
+  if(!target)throw new Error("Choose a workspace number or exact name.");
+  await send({type:"workspace:tab-move",sourceId:workspace.id,targetId:target.id,index});
+}
+function tabPanel(workspace,urls,query){
+  const panel=document.createElement("div");panel.className="tab-panel";
+  const matches=urls.map((url,index)=>({url,index})).filter(item=>!query||tabLabel(item.url).toLowerCase().includes(query));
+  if(!matches.length){const empty=document.createElement("div");empty.className="empty";empty.textContent="No matching tabs.";panel.appendChild(empty);return panel;}
+  for(const item of matches){
+    const row=document.createElement("div");row.className="tab-item";
+    const copy=document.createElement("div");copy.className="tab-copy";copy.title=item.url;
+    const title=document.createElement("div");title.className="tab-title";title.textContent=tabLabel(item.url);
+    const host=document.createElement("div");host.className="tab-host";host.textContent=item.url;
+    copy.append(title,host);copy.onclick=()=>run(()=>send({type:"workspace:tab-open",workspaceId:workspace.id,index:item.index}),true);
+    const actions=document.createElement("div");actions.className="tab-actions";
+    const open=small("Open","Open this tab",()=>send({type:"workspace:tab-open",workspaceId:workspace.id,index:item.index}));open.className="tab-action";
+    const move=small("Move","Move to another workspace",()=>moveTab(workspace,item.index));move.className="tab-action";
+    const remove=small("×","Remove this tab",()=>send({type:"workspace:tab-remove",workspaceId:workspace.id,index:item.index}));remove.className="tab-action danger";
+    actions.append(open,move,remove);row.append(copy,actions);panel.appendChild(row);
+  }
+  return panel;
+}
 async function render(){
   list.replaceChildren();if(!state.workspaces.length){const e=document.createElement("div");e.className="empty";e.textContent="Create your first workspace above.";list.appendChild(e);return;}
-  const live=await ungrouped();
+  const live=await ungrouped(),query=search.value.trim().toLowerCase();let shown=0;
   for(const w of state.workspaces){
-    const active=w.id===state.activeId,row=document.createElement("div");row.className=`row${active?" active":""}`;
+    const active=w.id===state.activeId,urls=active?live.map(cleanUrl):w.urls;
+    const workspaceMatch=w.title.toLowerCase().includes(query),tabMatch=urls.some(url=>tabLabel(url).toLowerCase().includes(query));
+    if(query&&!workspaceMatch&&!tabMatch)continue;shown++;
+    const card=document.createElement("div");card.className="workspace-card";
+    const row=document.createElement("div");row.className=`row${active?" active":""}`;
     const handle=document.createElement("span");handle.className="drag-handle";handle.draggable=true;handle.title="Drag to reorder";
     const dot=document.createElement("span");dot.className="dot";dot.style.setProperty("--color",COLORS[w.color]||COLORS.blue);handle.appendChild(dot);
     handle.ondragstart=event=>{event.dataTransfer.effectAllowed="move";event.dataTransfer.setData("text/plain",w.id);};
-    row.ondragover=event=>{event.preventDefault();const after=event.clientY>row.getBoundingClientRect().top+row.offsetHeight/2;row.classList.toggle("drag-before",!after);row.classList.toggle("drag-after",after);};
+    card.ondragover=event=>{event.preventDefault();const after=event.clientY>card.getBoundingClientRect().top+card.offsetHeight/2;row.classList.toggle("drag-before",!after);row.classList.toggle("drag-after",after);};
     row.ondragleave=()=>row.classList.remove("drag-before","drag-after");
     row.ondrop=event=>{event.preventDefault();const after=row.classList.contains("drag-after"),draggedId=event.dataTransfer.getData("text/plain");row.classList.remove("drag-before","drag-after");run(()=>dropWorkspace(draggedId,w.id,after));};
     const main=document.createElement("div");main.className="workspace";const title=document.createElement("div");title.className="title";title.textContent=w.title;
-    const count=document.createElement("div");count.className="count";const n=active?live.length:w.urls.length;count.textContent=`${n} tab${n===1?"":"s"}${active?" · active":" · parked"}`;
+    const count=document.createElement("div");count.className="count";const n=urls.length;count.textContent=`${n} tab${n===1?"":"s"}${active?" · active":" · parked"}`;
     main.append(title,count);main.onclick=()=>run(()=>send({type:"workspace:switch",targetId:w.id}),true);
     const actions=document.createElement("div");actions.className="actions";
+    const isExpanded=expanded.has(w.id)||Boolean(query&&tabMatch);const expand=small(isExpanded?"⌃":"⌄",isExpanded?"Hide tabs":"Show tabs",async()=>{expanded.has(w.id)?expanded.delete(w.id):expanded.add(w.id);});expand.classList.add("expand");actions.append(expand);
     if(!active)actions.append(small("↗","Move current tab here",()=>send({type:"workspace:move-tab",targetId:w.id})));
     const position=state.workspaces.findIndex(item=>item.id===w.id);
     actions.append(moreMenu([
@@ -80,8 +112,11 @@ async function render(){
       {label:"Move down",disabled:position===state.workspaces.length-1,handler:()=>moveWorkspace(w.id,1)},
       {label:"Rename",handler:async()=>{const value=prompt("Rename workspace",w.title);if(value!==null){w.title=value.trim()||"Untitled workspace";await save();}}},
       {label:"Delete workspace",danger:true,handler:async()=>{if(!confirm(`Delete “${w.title}”?${active?" Its open tabs will remain.":" Its saved tab list will be forgotten."}`))return;state.workspaces=state.workspaces.filter(x=>x.id!==w.id);if(active)state.activeId=null;await save();}}
-    ]));row.append(handle,main,actions);list.appendChild(row);
+    ]));row.append(handle,main,actions);card.appendChild(row);
+    if(isExpanded){card.classList.add("expanded");card.appendChild(tabPanel(w,urls,query&&!workspaceMatch?query:""));}
+    list.appendChild(card);
   }
+  if(!shown){const e=document.createElement("div");e.className="empty";e.textContent="No matching workspaces or tabs.";list.appendChild(e);}
 }
 
 async function renderRecentlyClosed(){
@@ -103,14 +138,15 @@ async function renderRecentlyClosed(){
 
 document.querySelector("#recent-toggle").onclick=()=>{
   const main=document.querySelector("main");main.style.height=`${main.getBoundingClientRect().height}px`;
-  document.querySelector("#workspace-header").hidden=true;document.querySelector("#create").hidden=true;list.hidden=true;document.querySelector("#recent-section").hidden=false;
+  document.querySelector("#workspace-header").hidden=true;document.querySelector("#create").hidden=true;document.querySelector("#search-wrap").hidden=true;list.hidden=true;document.querySelector("#recent-section").hidden=false;
 };
 document.querySelector("#recent-back").onclick=()=>{
-  document.querySelector("#recent-section").hidden=true;document.querySelector("#workspace-header").hidden=false;document.querySelector("#create").hidden=false;list.hidden=false;
+  document.querySelector("#recent-section").hidden=true;document.querySelector("#workspace-header").hidden=false;document.querySelector("#create").hidden=false;document.querySelector("#search-wrap").hidden=false;list.hidden=false;
   document.querySelector("main").style.height="";
 };
 document.addEventListener("click",event=>{if(!event.target.closest(".more-wrap"))closeMoreMenus();});
 async function send(message){const response=await chrome.runtime.sendMessage({...message,windowId});if(!response?.ok)throw new Error(response?.error||"Workspace operation failed.");}
 async function run(operation,close=false){status.textContent="";try{await operation();if(close)return window.close();await migrateAndLoad();await render();await renderRecentlyClosed();}catch(error){status.textContent=error.message;}}
 document.querySelector("#create").onsubmit=event=>{event.preventDefault();run(async()=>{const title=input.value.trim();if(!title)return input.focus();await send({type:"workspace:create",title});input.value="";},true);};
+search.oninput=()=>render().catch(error=>status.textContent=error.message);
 (async()=>{try{windowId=(await chrome.windows.getCurrent()).id;await migrateAndLoad();await render();await renderRecentlyClosed();}catch(error){status.textContent=error.message;}})();
